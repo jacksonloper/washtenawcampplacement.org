@@ -3,7 +3,7 @@
 This is a trial copy of washtenawcampplacement.org built without WordPress.
 Every page is a plain text file in [`content/`](content/). Pictures are in
 [`public/images/`](public/images/). Nothing here is live yet: the real site is
-still WordPress.
+still WordPress.  Live at https://washtenawcampplacement.netlify.app/
 
 The question this repo is meant to answer: **could you keep the site up to
 date by editing these files?** Have a look at a few pages and decide.
