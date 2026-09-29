@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+
+# Migration inputs: the WordPress database contains private user data.
+db.json
+*.sql
+*.sql.gz
+images.txt

@@ -1,0 +1,55 @@
+# Site-wide settings: header, menu and footer.
+# Pages live next to this file as markdown.
+
+title: Washtenaw Camp Placement
+tagline: Sending kids to camp. One summer at a time.
+logo: /images/2026/01/washtenaw-camp-placement.png
+url: https://washtenawcampplacement.org
+
+donate:
+  label: Donate now
+  url: https://secure.qgiv.com/for/campmatters
+
+menu:
+  - label: About
+    url: /mission-values-vision/
+    children:
+      - { label: Mission / Values / Vision, url: /mission-values-vision/ }
+      - { label: Community Partnerships, url: /community-partnerships/ }
+      - { label: Team, url: /team/ }
+      - { label: Board of Directors, url: /board-of-directors/ }
+      - { label: In the Spotlight, url: /in-the-spotlight/ }
+  - { label: Families, url: /families/ }
+  - { label: How to Refer, url: /how-to-refer/ }
+  - { label: How to Apply, url: /how-to-apply/ }
+  - { label: Volunteer, url: /volunteer/ }
+
+contact:
+  address: |
+    3135 South State Street
+    Suite 350-D
+    Ann Arbor, Michigan 48108
+  phone: (415) 794-1670
+  fax: (734) 661-4029
+  email: afales@WashtenawCampPlacement.org
+
+social:
+  facebook: https://www.facebook.com/WashtenawCampPlacement/
+  instagram: https://www.instagram.com/washtenawcampplacement/
+  linkedin: https://www.linkedin.com/company/washtenaw-camp-placement/
+
+footer:
+  - - { label: Mission / Values / Vision, url: /mission-values-vision/ }
+    - { label: Team, url: /team/ }
+    - { label: Board of Directors, url: /board-of-directors/ }
+    - { label: In the Spotlight, url: /in-the-spotlight/ }
+    - { label: Privacy Statement, url: /privacy-statement/ }
+    - { label: Families, url: /families/ }
+    - { label: How to Refer, url: /how-to-refer/ }
+  - - { label: How to Apply, url: /how-to-apply/ }
+    - { label: Volunteer, url: /volunteer/ }
+    - { label: Giving, url: /giving/ }
+    - { label: Ways to Give, url: /giving/ways-to-give/ }
+    - { label: Partner Camps, url: /partner-camps/ }
+    - { label: Heather Sloan Scholarship, url: /partner-camps/heather-sloan-scholarship/ }
+    - { label: Testimonials, url: /testimonials/ }
