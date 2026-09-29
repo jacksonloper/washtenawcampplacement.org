@@ -99,7 +99,7 @@ function header(site) {
     <a class="logo" href="/"><img src="${site.logo}" width="191" height="82" alt="${esc(site.title)}"></a>
     <p class="tagline">${esc(site.tagline)}</p>
     <div class="header-actions">
-      <a class="lang" data-translate="es" href="#">Español</a>
+      <a class="lang notranslate" data-translate="es" href="#" lang="es">Español</a>
       <a class="donate" href="${site.donate.url}" target="_blank" rel="noopener">${esc(site.donate.label)}</a>
     </div>
   </div>
