@@ -61,18 +61,43 @@ document.querySelector('.menu-toggle')?.addEventListener('click', (e) => {
   e.currentTarget.setAttribute('aria-expanded', String(open));
 });
 
-// Spanish: hand the current page to Google Translate's proxy, which is what
-// the GTranslate plugin does under the hood. No script or cookie needed.
-document.querySelector('[data-translate]')?.addEventListener('click', (e) => {
-  e.preventDefault();
-  const host = location.hostname.replace(/-/g, '--').replace(/\./g, '-');
-  const lang = e.currentTarget.dataset.translate;
-  if (/localhost|127\.0\.0\.1/.test(host)) {
-    alert(`Translation works once the site is public (Google needs to fetch the page).`);
-    return;
+// Spanish: what the free GTranslate plugin did on the WordPress site. Google's
+// Website Translator script rewrites the page text in the browser, and its
+// "googtrans" cookie keeps the language as the visitor moves between pages.
+const langLink = document.querySelector('[data-translate]');
+const translating = /(?:^|;\s*)googtrans=\/en\/\w/.test(document.cookie);
+
+function setGoogtrans(value) {
+  // Google's script may also set the cookie on the domain, so write both forms.
+  const expires = value ? '' : '; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = `googtrans=${value}; path=/${expires}`;
+  document.cookie = `googtrans=${value}; path=/; domain=${location.hostname}${expires}`;
+}
+
+function loadTranslator() {
+  const holder = document.createElement('div');
+  holder.id = 'google_translate_element';
+  holder.hidden = true;
+  document.body.append(holder);
+  window.wcpTranslateInit = () =>
+    new google.translate.TranslateElement({ pageLanguage: 'en', autoDisplay: false }, holder.id);
+  const s = document.createElement('script');
+  s.src = 'https://translate.google.com/translate_a/element.js?cb=wcpTranslateInit';
+  document.head.append(s);
+}
+
+if (langLink) {
+  if (translating) {
+    langLink.textContent = 'English';
+    langLink.lang = 'en';
+    loadTranslator();
   }
-  location.href = `https://${host}.translate.goog${location.pathname}?_x_tr_sl=en&_x_tr_tl=${lang}&_x_tr_hl=${lang}`;
-});
+  langLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    setGoogtrans(translating ? '' : `/en/${langLink.dataset.translate}`);
+    location.reload();
+  });
+}
 
 if (!render(location.pathname, { scroll: false })) {
   main.innerHTML = '<div class="page"><h1>Page not found</h1><p>Sorry, that page doesn’t exist. Try the <a href="/">home page</a>.</p></div>';
