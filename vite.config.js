@@ -191,6 +191,9 @@ function wcpContent() {
           fs.writeFileSync(af, `<!doctype html><meta charset="utf-8"><title>Redirecting…</title><link rel="canonical" href="${p.url}"><meta http-equiv="refresh" content="0; url=${p.url}"><a href="${p.url}">${esc(p.title)}</a>`);
         }
       }
+      // Netlify: real 301s for aliases; the "!" makes them win over the refresh pages above.
+      fs.writeFileSync(path.join(outDir, '_redirects'),
+        data.pages.flatMap((p) => p.aliases.map((a) => `${a} ${p.url} 301!`)).join('\n') + '\n');
       fs.writeFileSync(path.join(outDir, '404.html'), page(`Page not found - ${data.site.title}`,
         '<div class="page"><h1>Page not found</h1><p>Sorry, that page doesn’t exist. Try the <a href="/">home page</a>.</p></div>'));
       fs.writeFileSync(path.join(outDir, 'sitemap.xml'),

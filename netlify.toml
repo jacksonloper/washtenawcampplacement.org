@@ -1,0 +1,43 @@
+# Netlify settings. Page aliases (old URLs from the `aliases:` line in a page's
+# front matter) are turned into dist/_redirects by vite.config.js at build time.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# Old WordPress image links (e.g. from emails or other sites) point here.
+[[redirects]]
+  from = "/wp-content/uploads/*"
+  to = "/images/:splat"
+  status = 301
+
+# Old WordPress feed and admin URLs.
+[[redirects]]
+  from = "/feed/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/wp-admin/*"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/wp-login.php"
+  to = "/"
+  status = 301
+
+# Vite puts a content hash in every file name under /assets/, so they never change.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
