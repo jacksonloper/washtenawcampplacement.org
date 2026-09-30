@@ -2,66 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
-import MarkdownIt from 'markdown-it';
-import container from 'markdown-it-container';
 import matter from 'gray-matter';
 import { load as loadYaml } from 'js-yaml';
+import { renderPage, esc } from './src/render.js';
 
 const CONTENT = fileURLToPath(new URL('./content', import.meta.url));
-
-// ---------------------------------------------------------------------------
-// Markdown: CommonMark + raw HTML + a few ::: containers for Divi-style layout.
-//
-//   :::::: band #d6efb0      full-width coloured stripe
-//   ::::: columns 3/4 1/4    side-by-side columns (stack on phones)
-//   :::: column
-//   ::: details Question {open}   accordion item
-//   ::: quote                green emphasised text
-//
-// Outer containers need more colons than the ones nested inside them.
-// ---------------------------------------------------------------------------
-
-const md = new MarkdownIt({ html: true, linkify: true, typographer: false });
-
-const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-
-md.use(container, 'band', {
-  render(tokens, i) {
-    if (tokens[i].nesting !== 1) return '</div></section>\n';
-    const color = tokens[i].info.trim().split(/\s+/)[1] || '';
-    const style = /^#[0-9a-f]{3,8}$/i.test(color) ? ` style="--band:${color}"` : '';
-    return `<section class="band"${style}><div class="wrap">\n`;
-  },
-});
-
-md.use(container, 'columns', {
-  render(tokens, i) {
-    if (tokens[i].nesting !== 1) return '</div>\n';
-    const widths = tokens[i].info.trim().split(/\s+/).slice(1).map((w) => {
-      const [a, b] = w.split('/').map(Number);
-      return b ? `${+(a / b * 12).toFixed(2)}fr` : '1fr';
-    });
-    return `<div class="columns" style="--cols:${widths.join(' ') || 'repeat(auto-fit,minmax(0,1fr))'}">\n`;
-  },
-});
-
-md.use(container, 'column', {
-  render: (tokens, i) => (tokens[i].nesting === 1 ? '<div class="column">\n' : '</div>\n'),
-});
-
-md.use(container, 'details', {
-  render(tokens, i) {
-    if (tokens[i].nesting !== 1) return '</div></details>\n';
-    let title = tokens[i].info.trim().replace(/^details\s*/, '');
-    const open = /\{open\}\s*$/.test(title);
-    title = title.replace(/\s*\{open\}\s*$/, '');
-    return `<details class="accordion"${open ? ' open' : ''}><summary>${md.renderInline(title)}</summary><div>\n`;
-  },
-});
-
-md.use(container, 'quote', {
-  render: (tokens, i) => (tokens[i].nesting === 1 ? '<div class="quote">\n' : '</div>\n'),
-});
 
 // ---------------------------------------------------------------------------
 // Content loading
@@ -73,7 +18,7 @@ function loadSite() {
   for (const file of fs.readdirSync(CONTENT).filter((f) => f.endsWith('.md')).sort()) {
     const { data, content } = matter(fs.readFileSync(path.join(CONTENT, file), 'utf8'));
     const url = data.url || (file === 'index.md' ? '/' : `/${file.replace(/\.md$/, '')}/`);
-    pages.push({ file, url, title: data.title || url, description: data.description || '', aliases: data.aliases || [], html: `<div class="page">${md.render(content)}</div>` });
+    pages.push({ file, url, title: data.title || url, description: data.description || '', aliases: data.aliases || [], html: renderPage(data, content) });
   }
   return { site, pages };
 }
@@ -90,7 +35,7 @@ const ICONS = {
 
 function header(site) {
   const item = (m) => {
-    if (!m.children) return `<li><a href="${m.url}">${esc(m.label)}</a></li>`;
+    if (!m.children?.length) return `<li><a href="${m.url}">${esc(m.label)}</a></li>`;
     return `<li class="has-sub"><a href="${m.url}">${esc(m.label)}</a><ul>${m.children.map(item).join('')}</ul></li>`;
   };
   return `
@@ -117,7 +62,7 @@ function footer(site) {
   const social = Object.entries(site.social || {})
     .map(([k, url]) => `<a href="${url}" target="_blank" rel="noopener" aria-label="${k}"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">${ICONS[k] || ''}</svg></a>`)
     .join('');
-  const cols = site.footer.map((col) => `<ul>${col.map((l) => `<li><a href="${l.url}">${esc(l.label)}</a></li>`).join('')}</ul>`).join('');
+  const cols = site.footer.map((col) => `<ul>${col.links.map((l) => `<li><a href="${l.url}">${esc(l.label)}</a></li>`).join('')}</ul>`).join('');
   return `
 <footer class="site-footer">
   <div class="wrap footer-grid">
@@ -207,4 +152,15 @@ function wcpContent() {
 export default defineConfig({
   plugins: [wcpContent()],
   appType: 'spa',
+  // The Decap editor saves to the branch this build came from, so a Netlify
+  // deploy preview edits its own pull request instead of the live site.
+  define: { __CMS_BRANCH__: JSON.stringify(process.env.HEAD || 'main') },
+  build: {
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        admin: fileURLToPath(new URL('./admin/index.html', import.meta.url)),
+      },
+    },
+  },
 });

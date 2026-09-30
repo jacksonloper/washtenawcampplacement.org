@@ -112,6 +112,29 @@ main { min-height: 50vh; }
 .column > :last-child { margin-bottom: 0; }
 .column img { margin: 0 auto 16px; }
 
+/* Number tiles on the home page (the "stats" section). */
+.stat {
+  --tile: #e5e513;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 92px;
+  margin: 0 auto 16px;
+  color: #007337;
+  font: 700 34px/1 var(--sans);
+}
+.stat span { position: relative; }
+.stat-circle { width: 80px; height: 80px; margin-top: 6px; margin-bottom: 22px; border-radius: 50%; background: var(--tile); font-size: 33px; }
+.stat-plain { font: 700 46px/1 var(--serif); font-variant-numeric: oldstyle-nums; font-feature-settings: "onum"; }
+.stat-bill { width: fit-content; min-width: 96px; height: 70px; margin-top: 11px; margin-bottom: 27px; padding: 5px 30px; background: var(--tile); font-size: 38px; }
+.stat-bill span { display: flex; align-items: center; height: 100%; padding: 0 12px; background: #fff; }
+.stat-person { --tile: #c2d428; width: 86px; align-items: flex-start; font-size: 24px; }
+.stat-person::before, .stat-person::after { content: ""; position: absolute; left: 50%; background: var(--tile); }
+.stat-person::before { top: 0; width: 60px; height: 66px; margin-left: -30px; border-radius: 50%; }
+.stat-person::after { bottom: 0; width: 88px; height: 30px; margin-left: -44px; border-radius: 34px 34px 0 0; }
+.stat-person span { margin-top: 20px; }
+
 .quote { color: var(--green); font-size: 16px; }
 .quote h1 { color: inherit; }
 
