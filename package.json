@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cms": "npx --yes decap-server@3"
   },
   "devDependencies": {
     "gray-matter": "^4.0.3",

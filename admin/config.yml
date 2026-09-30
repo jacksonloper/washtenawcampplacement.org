@@ -1,0 +1,192 @@
+# Decap CMS: the editor at /admin/. See "Editing in the browser" in README.md.
+# src/admin.js loads this file when the site is built.
+
+backend:
+  name: github
+  repo: jacksonloper/washtenawcampplacement.org
+  branch: main # replaced with the branch being built, so previews edit their own PR
+  site_domain: washtenawcampplacement.netlify.app # for logging in from preview URLs
+  commit_messages:
+    create: 'Add page “{{slug}}” (via editor)'
+    update: 'Edit {{collection}} “{{slug}}” (via editor)'
+    delete: 'Delete page “{{slug}}” (via editor)'
+    uploadMedia: 'Upload {{path}} (via editor)'
+    deleteMedia: 'Delete {{path}} (via editor)'
+
+# On localhost, `npx decap-server` lets you edit the files on disk without logging in.
+local_backend: true
+
+site_url: https://washtenawcampplacement.netlify.app
+display_url: https://washtenawcampplacement.netlify.app
+logo_url: /images/2026/01/washtenaw-camp-placement.png
+
+media_folder: public/images/uploads
+public_folder: /images/uploads
+
+collections:
+  - name: pages
+    label: Pages
+    label_singular: Page
+    folder: content
+    extension: md
+    format: page-yaml # defined in src/admin.js
+    create: true
+    slug: '{{slug}}'
+    identifier_field: title
+    summary: '{{title}}'
+    sortable_fields: [title]
+    editor: { preview: true }
+    fields:
+      - { name: title, label: Page title, widget: string }
+      - name: sections
+        label: Page content
+        label_singular: section
+        widget: list
+        typeKey: type
+        hint: Each section is a block down the page. Drag to reorder.
+        types:
+          - name: text
+            label: Text
+            summary: '{{fields.body | truncate(70, "…")}}'
+            fields:
+              - &body { name: body, label: Text, widget: markdown, required: false, editor_components: [image, details, quote] }
+          - name: band
+            label: Coloured band (full width)
+            summary: '{{fields.body | truncate(70, "…")}}'
+            fields:
+              - name: color
+                label: Colour
+                widget: select
+                default: '#d6efb0'
+                options:
+                  - { label: Light green, value: '#d6efb0' }
+                  - { label: Green, value: '#a3d46d' }
+              - *body
+          - name: columns
+            label: Columns
+            summary: 'Columns: {{fields.layout}}'
+            fields:
+              - name: layout
+                label: Column widths
+                widget: select
+                hint: On phones, columns stack on top of each other.
+                options:
+                  - { label: 'Two equal', value: 1/2 1/2 }
+                  - { label: 'Three equal', value: 1/3 1/3 1/3 }
+                  - { label: 'Four equal', value: 1/4 1/4 1/4 1/4 }
+                  - { label: 'Five equal', value: 1/5 1/5 1/5 1/5 1/5 }
+                  - { label: 'Wide, narrow at right', value: 3/4 1/4 }
+                  - { label: 'Narrow, wide, narrow', value: 1/4 1/2 1/4 }
+                  - { label: 'Narrow margins, wide middle', value: 1/5 3/5 1/5 }
+              - name: columns
+                label: Columns
+                label_singular: column
+                widget: list
+                summary: '{{fields.body | truncate(50, "…")}}'
+                fields: [*body]
+          - name: stats
+            label: Number tiles
+            summary: 'Number tiles'
+            fields:
+              - name: items
+                label: Tiles
+                label_singular: tile
+                widget: list
+                summary: '{{fields.number}} – {{fields.caption}}'
+                fields:
+                  - { name: number, label: Number, widget: string, hint: 'As it should appear, e.g. 140 or $900' }
+                  - { name: caption, label: Caption, widget: string }
+                  - name: shape
+                    label: Shape
+                    widget: select
+                    default: circle
+                    options:
+                      - { label: Yellow circle, value: circle }
+                      - { label: Person, value: person }
+                      - { label: Dollar bill, value: bill }
+                      - { label: Plain number, value: plain }
+      - { name: description, label: Search engine description, widget: text, required: false }
+      - name: updated
+        label: Last reviewed
+        widget: datetime
+        required: false
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        picker_utc: true
+      - name: url
+        label: Web address
+        widget: string
+        required: false
+        hint: 'Leave blank to use /file-name/. Changing it breaks existing links; if you must, add the old address below.'
+      - name: aliases
+        label: Old web addresses that redirect here
+        widget: list
+        required: false
+        field: { name: alias, label: Address, widget: string }
+
+  - name: settings
+    label: Site settings
+    format: site-yaml # defined in src/admin.js
+    editor: { preview: false }
+    files:
+      - name: site
+        label: Header, menu and footer
+        file: content/site.yml
+        fields:
+          - { name: title, label: Site name, widget: string }
+          - { name: tagline, label: Tagline, widget: string }
+          - { name: logo, label: Logo, widget: image }
+          - { name: url, label: Live web address, widget: string }
+          - name: donate
+            label: Donate button
+            widget: object
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: url, label: Link, widget: string }
+          - name: menu
+            label: Main menu
+            label_singular: menu item
+            widget: list
+            summary: '{{fields.label}}'
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: url, label: Link, widget: string }
+              - name: children
+                label: Drop-down items
+                label_singular: drop-down item
+                widget: list
+                required: false
+                summary: '{{fields.label}}'
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: url, label: Link, widget: string }
+          - name: contact
+            label: Contact details (footer)
+            widget: object
+            fields:
+              - { name: address, label: Address, widget: text }
+              - { name: phone, label: Phone, widget: string }
+              - { name: fax, label: Fax, widget: string }
+              - { name: email, label: Email, widget: string }
+          - name: social
+            label: Social media links
+            widget: object
+            fields:
+              - { name: facebook, label: Facebook, widget: string, required: false }
+              - { name: instagram, label: Instagram, widget: string, required: false }
+              - { name: linkedin, label: LinkedIn, widget: string, required: false }
+          - name: footer
+            label: Footer link columns
+            label_singular: column
+            widget: list
+            summary: '{{fields.links.0.label}} …'
+            fields:
+              - name: links
+                label: Links
+                label_singular: link
+                widget: list
+                summary: '{{fields.label}}'
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: url, label: Link, widget: string }
