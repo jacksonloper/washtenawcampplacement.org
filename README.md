@@ -108,8 +108,10 @@ Anyone who edits needs a GitHub account with write access to this repository
 1. On GitHub: Settings → Developer settings → OAuth Apps → **New OAuth App**.
    Homepage URL `https://washtenawcampplacement.netlify.app`, callback URL
    `https://api.netlify.com/auth/done`. Note the client ID and make a client secret.
-2. On Netlify: Site configuration → Access & security → OAuth →
-   **Install provider** → GitHub, and paste the client ID and secret.
+2. On Netlify: Project configuration → Security → OAuth
+   ([direct link](https://app.netlify.com/projects/washtenawcampplacement/configuration/security#oauth)),
+   under **Authentication providers** click **Install provider** → GitHub,
+   and paste the client ID and secret.
 
 The editor's settings are in [`admin/config.yml`](admin/config.yml), and its
 preview and special boxes in [`src/admin.js`](src/admin.js).
